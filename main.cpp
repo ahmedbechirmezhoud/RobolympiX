@@ -110,15 +110,15 @@ Path path = Path(robot);
 void update_values(TIM_HandleTypeDef* htim, float *angle, uint32_t *counter, float *distance){
 	float old_angle = *angle;
 	*counter = __HAL_TIM_GET_COUNTER(htim);
-	*angle = 360. * (*counter) / 4096 ;
+	*angle = 360. * (*counter) / (htim->Init.Period + 1) ;
 	if ((old_angle>350) && (*angle<10)){
-		*distance += 250 * (360-old_angle+(*angle)) / 360;
+		*distance += WHEEL_PERIMETER * (360-old_angle+(*angle)) / 360;
 	}
 	else if ((old_angle<10) && ((*angle)>350)){
-		*distance += 250 * ((*angle)-old_angle-360) / 360;
+		*distance += WHEEL_PERIMETER * ((*angle)-old_angle-360) / 360;
 	}
 	else{
-		*distance += 250 * (*angle-old_angle) / 360;
+		*distance += WHEEL_PERIMETER * (*angle-old_angle) / 360;
 	}
 }
 

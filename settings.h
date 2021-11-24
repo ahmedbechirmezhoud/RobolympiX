@@ -18,10 +18,8 @@
 // Motor max Velocity
 #define MAX_VELOCITY 255
 #define MIN_VELOCITY 0
-
-//ANGULAR DIFFERENCE TO ANGLE RAPPORT
-#define LAMBDA 10 //   Milliradian/Millimeter
-
+ 
+#define WHEEL_PERIMETER  250  //ENCODER'S WHEEL 
 
 #define ENTRAXE 350
 
