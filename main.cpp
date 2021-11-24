@@ -146,6 +146,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	distanceL = robot.getDistanceL();
 	distanceR = robot.getDistanceR();
 
+  path.updateState();
+
 }
 
 void firstTaskfunc(){
