@@ -35,7 +35,7 @@ int Path::updateState(){
 
 		reachedTarget.task();
 
-		switch(reachedTarget.type){
+		switch(predefinedPath.front().type){
 
 			case alpha:
 				set_SetPoint(reachedTarget.absoluteCoordinates, predefinedPath.front().angle);
