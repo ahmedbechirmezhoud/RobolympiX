@@ -34,7 +34,7 @@ int Path::updateState(){
 		predefinedPath.pop();
 
 		reachedTarget.task();
-
+		
 		switch(predefinedPath.front().type){
 
 			case alpha:
@@ -62,7 +62,7 @@ int Path::updateState(){
 
 	vector<int> command = controller();
 	robot.setMotorL(command[0]);
-	robot.setAngleR(command[1]);
+	robot.setMotorR(command[1]);
 
 	return 0;
 }

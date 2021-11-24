@@ -16,7 +16,7 @@
 #define KD_ANGULAR 1
 
 // Motor max Velocity
-#define MAX_VELOCITY 255
+#define MAX_VELOCITY 1023
 #define MIN_VELOCITY 0
  
 #define WHEEL_PERIMETER  250  //ENCODER'S WHEEL 

@@ -50,13 +50,15 @@ void initPID(state initState){
 */
 vector<int> scale(float linearCommand, float angularCommand){
 	vector<int> command;
-	if((linearCommand + angularCommand) > MAX_VELOCITY){
-		command[0] = MAX_VELOCITY;
-		command[1] = MAX_VELOCITY - angularCommand;
-	}
+
 	command[0] = roundf(linearCommand + angularCommand);
 	command[1] = roundf(linearCommand - angularCommand);
 
+	if((linearCommand + angularCommand) > MAX_VELOCITY){
+		float b = MAX_VELOCITY / (linearCommand + angularCommand);
+		command[0] *= b;
+		command[1] *= b;
+	}
 	return command;
 }
 

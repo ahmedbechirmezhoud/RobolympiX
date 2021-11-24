@@ -61,15 +61,15 @@ vector<float> prevDistance = {0,0};
 
 /**
  returns the new State after considering the new and the previous sensed values
- @params distanceL the distance from the left encoder
- @params distanceL the distance from the rignt encoder
+ @param distanceL the distance from the left encoder
+ @param distanceL the distance from the rignt encoder
  @return state the current Sensed state
  */
 state odometry(float distanceL, float distanceR){
 
 	//the difference between the two value is the arc created by the rotation of the robot
 	// arc = angle * radius -> angle = arc / radius
-	angle = (distanceL - distanceR) / (ENTRAXE/2);
+	float angle = (distanceL - distanceR) / (ENTRAXE/2);
 
 	//to simplify the robot is considered as a point in the 2D space
 	//then, we consider the middle point of entraxe as the Robot coordinates
