@@ -17,9 +17,15 @@ float absoluteAngle(vector<float> coordinates);
 
 float degree2miliradian(float degree);
 
+float mapAngle(float mrad);
+
+float degree2radian(float deg);
+
 float radian2milliradian(float radian);
 
 float milliradian2radian(float mrad);
+
+float radian2degree(float rad );
 
 state odometry(float distanceL, float distanceR);
 
