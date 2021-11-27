@@ -9,26 +9,33 @@
 #include "odometry.h"
 #include "Robot.h"
 
-Path::Path(Robot robot ) {
+
+Path::Path(Robot robot){
 	vector<float> a{X_INIT, Y_INIT};
 	this->currentState.position = a;
 	this->currentState.angle = ALPHA_INIT;
 	this->robot = robot;
 	initPID(currentState);
+	time_var = HAL_GetTick();
+	dt = 0;
 }
 
 Path::~Path() {
 	// TODO Auto-generated destructor stub
 }
 
+void Path::updateTime(){
+	dt = HAL_GetTick() - time_var;
+	time_var = HAL_GetTick();
+}
 
 int Path::updateState(){
 
 	state sensedState = odometry(robot.getDistanceL(), robot.getDistanceR());
+	updateTime();
+	set_processVariable(sensedState, dt);
 
-	set_processVariable(sensedState);
-
-	if(targerReached()){
+	if(linearReached() && angularReached()){
 
 		job reachedTarget = predefinedPath.front();
 		predefinedPath.pop();

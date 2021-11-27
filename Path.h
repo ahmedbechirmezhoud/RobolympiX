@@ -9,7 +9,6 @@
 #include <vector>
 using std::vector;
 using std::queue;
-#include "Path.h"
 #include "PID.h"
 #include "Robot.h"
 
@@ -31,17 +30,20 @@ typedef struct job{
 } job;
 
 
-queue<job> predefinedPath;
 
 class Path {
 private:
 	queue<job> predefinedPath; // predefined set of Jobs
 	state currentState; //current position and orientation
 	Robot robot;
+	uint32_t time_var;
+	uint32_t dt;
+
 public:
 	Path(Robot robot);
 	virtual ~Path();
 	int updateState();
+	void updateTime();
 	queue<job> getPredefinePath();
 	void setPredefinedPath(queue<job> path);
 	state getCurrentState();
