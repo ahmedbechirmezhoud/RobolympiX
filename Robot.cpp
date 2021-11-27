@@ -4,8 +4,23 @@
 
 #include "Robot.h"
 
+Robot::Robot(){
+	this->init();
+}
+
 Robot::Robot(TIM_HandleTypeDef* motorsTimer, TIM_HandleTypeDef* encoderTimerL, TIM_HandleTypeDef* encoderTimerR) {
 	// TODO Auto-generated constructor stub
+	this->init();
+	this->motorsTimer = motorsTimer;
+	this->encoderTimerL = encoderTimerL;
+	this->encoderTimerR = encoderTimerR;
+}
+
+Robot::~Robot() {
+	// TODO Auto-generated destructor stub
+}
+
+void Robot::init(){
 	motorRF = 0;
 	motorLF = 0;
 	motorRB = 0;
@@ -18,16 +33,7 @@ Robot::Robot(TIM_HandleTypeDef* motorsTimer, TIM_HandleTypeDef* encoderTimerL, T
 	counterR = 0;
 	distanceR = 0;
 	distanceL = 0;
-	this->motorsTimer = motorsTimer;
-	this->encoderTimerL = encoderTimerL;
-	this->encoderTimerR = encoderTimerR;
 }
-
-Robot::~Robot() {
-	// TODO Auto-generated destructor stub
-}
-
-
 
 void Robot::change_pulse(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t pulse)
 {
@@ -51,19 +57,19 @@ void Robot::change_pulse(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t pul
 }
 
 void Robot::setMotorLF(int motorLF){
-	change_pulse(motorsTimer, TIM_CHANNEL_1, motorLF);
+	change_pulse(motorsTimer, TIM_CHANNEL_3, motorLF);
 }
 
 void Robot::setMotorLB(int motorLB){
-	change_pulse(motorsTimer, TIM_CHANNEL_2, motorLB);
+	change_pulse(motorsTimer, TIM_CHANNEL_4, motorLB);
 }
 
 void Robot::setMotorRF(int motorRF){
-	change_pulse(motorsTimer, TIM_CHANNEL_3, motorRF);
+	change_pulse(motorsTimer, TIM_CHANNEL_1, motorRF);
 }
 
 void Robot::setMotorRB(int motorRB){
-	change_pulse(motorsTimer, TIM_CHANNEL_4, motorRB);
+	change_pulse(motorsTimer, TIM_CHANNEL_2, motorRB);
 }
 
 void Robot::setMotorL(int motorL){

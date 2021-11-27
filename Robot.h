@@ -25,6 +25,7 @@ private:
 	TIM_HandleTypeDef* encoderTimerL;
 	TIM_HandleTypeDef* encoderTimerR;
 
+	void init();
 	void setMotorRF(int motorRF);
 	void setMotorLF(int motorLF);
 	void setMotorRB(int motorRB);
@@ -32,8 +33,8 @@ private:
 	void change_pulse(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t pulse);
 
 public:
-	Robot(TIM_HandleTypeDef* motorsTimer, TIM_HandleTypeDef* encoderTimerL, TIM_HandleTypeDef* encoderTimerR);
 	Robot();
+	Robot(TIM_HandleTypeDef* motorsTimer, TIM_HandleTypeDef* encoderTimerL, TIM_HandleTypeDef* encoderTimerR);
 	virtual ~Robot();
 	void setMotorR(int motorR);
 	void setMotorL(int motorL);
