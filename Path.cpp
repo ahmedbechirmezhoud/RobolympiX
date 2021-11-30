@@ -8,6 +8,7 @@
 #include <math.h>
 #include "odometry.h"
 #include "Robot.h"
+#include <queue>
 
 
 Path::Path(Robot robot){
@@ -16,8 +17,19 @@ Path::Path(Robot robot){
 	this->currentState.angle = ALPHA_INIT;
 	this->robot = robot;
 	initPID(currentState);
+
+
+	this->robot = robot;
+
+	job init;
+	init.absoluteCoordinates = this->currentState.position;
+	init.angle = this->currentState.angle;
+	init.type = xyAbsolute;
+	this->predefinedPath.push(init);
+	
 	time_var = HAL_GetTick();
 	dt = 0;
+
 }
 
 Path::~Path() {
@@ -35,37 +47,27 @@ int Path::updateState(){
 	updateTime();
 	set_processVariable(sensedState, dt);
 
-	if(linearReached() && angularReached()){
-
-		job reachedTarget = predefinedPath.front();
+	if( linearReached() && angularReached() && !predefinedPath.empty()){
+		job reachedPoint = predefinedPath.front();
 		predefinedPath.pop();
 
-		reachedTarget.task();
-		
-		switch(predefinedPath.front().type){
+		if (!predefinedPath.empty()){
 
-			case alpha:
-				set_SetPoint(reachedTarget.absoluteCoordinates, predefinedPath.front().angle);
-				break;
+			initError();
 
-			case xyAbsolute:
-				set_SetPoint(predefinedPath.front().absoluteCoordinates, relativeAngle(currentState, absolute2relative(currentState, reachedTarget.absoluteCoordinates)) );
-				break;
+			if(predefinedPath.front().type == xyAbsolute)
+				set_SetPoint(predefinedPath.front().absoluteCoordinates, predefinedPath.front().angle);
 
-			case xyRelative:
+			if(predefinedPath.front().type == alpha)
+				set_SetPoint(reachedPoint.absoluteCoordinates , predefinedPath.front().angle);
+
+			if(predefinedPath.front().type == xyRelative){
 				predefinedPath.front().absoluteCoordinates = relative2absolute(currentState, predefinedPath.front().translation);
-				set_SetPoint(predefinedPath.front().translation, relativeAngle(currentState, reachedTarget.translation) );
-				break;
-
-			case stop:
-				set_SetPoint(reachedTarget.absoluteCoordinates, reachedTarget.angle);
-				break;
-
-			default:
-				return 1;
-		};
-
+				set_SetPoint(predefinedPath.front().absoluteCoordinates, NAN);
+			}
+		}
 	}
+
 
 	vector<int> command = controller();
 	robot.setMotorL(command[0]);

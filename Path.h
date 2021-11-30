@@ -33,7 +33,7 @@ typedef struct job{
 
 class Path {
 private:
-	queue<job> predefinedPath; // predefined set of Jobs
+	queue<job> predefinedPath; // predefined queue of Jobs
 	state currentState; //current position and orientation
 	Robot robot;
 	uint32_t time_var;
