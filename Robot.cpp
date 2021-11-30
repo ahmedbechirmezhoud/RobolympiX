@@ -57,18 +57,22 @@ void Robot::change_pulse(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t pul
 }
 
 void Robot::setMotorLF(int motorLF){
+	this->motorLF = motorLF;
 	change_pulse(motorsTimer, TIM_CHANNEL_3, motorLF);
 }
 
 void Robot::setMotorLB(int motorLB){
+	this->motorLB = motorLB;
 	change_pulse(motorsTimer, TIM_CHANNEL_4, motorLB);
 }
 
 void Robot::setMotorRF(int motorRF){
+	this->motorRF = motorRF;
 	change_pulse(motorsTimer, TIM_CHANNEL_1, motorRF);
 }
 
 void Robot::setMotorRB(int motorRB){
+	this->motorRB = motorRB;
 	change_pulse(motorsTimer, TIM_CHANNEL_2, motorRB);
 }
 
@@ -166,6 +170,14 @@ TIM_HandleTypeDef* Robot::getEncoderLTimer(){
 
 TIM_HandleTypeDef* Robot::getEncoderRTimer(){
 	return encoderTimerR;
+}
+
+int Robot::getMotorR(){
+	return motorRF - motorRB;
+}
+
+int Robot::getMotorL(){
+	return motorLF - motorLB;
 }
 
 

@@ -56,6 +56,8 @@ public:
 	float getDistanceL();
 	TIM_HandleTypeDef* getEncoderLTimer();
 	TIM_HandleTypeDef* getEncoderRTimer();
+	int getMotorR();
+	int getMotorL();
 
 };
 
