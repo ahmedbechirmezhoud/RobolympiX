@@ -26,6 +26,7 @@
 #include "Path.h"
 #include "odometry.h"
 #include "PID.h"
+#include <queue>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,31 +69,17 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
 Robot robot = Robot(&htim4, &htim2, &htim3);
 Path path = Path(robot);
-float distanceL = 0;
-float distanceR = 0;
-int d5al = 0;
-uint32_t counterRg = 0;
-uint32_t angleRg = 0;
-uint32_t counterLg = 0;
-uint32_t angleLg = 0;
-float angle_err = 0;
-uint32_t time_var = HAL_GetTick();
-uint32_t  dt = 0;
-int err2;
-float x = 0;
-float y = 0;
-float angle_odo = 0;
-
-
 
 void update_values(TIM_HandleTypeDef* htim, float *angle, uint32_t *counter, float *distance){
 	float old_angle = *angle;
 	*counter = __HAL_TIM_GET_COUNTER(htim);
 	*angle = 360. * (*counter) / (htim->Init.Period + 1);
 	if ((old_angle>350) && (*angle<10)){
-		*distance += WHEEL_PERIMETER * (360-old_angle+(*angle)) / 360;
+		*distance +=  WHEEL_PERIMETER * (360-old_angle+(*angle)) / 360;
 	}
 	else if ((old_angle<10) && ((*angle)>350)){
 		*distance += WHEEL_PERIMETER * ((*angle)-old_angle-360) / 360;
@@ -100,6 +87,7 @@ void update_values(TIM_HandleTypeDef* htim, float *angle, uint32_t *counter, flo
 	else{
 		*distance += WHEEL_PERIMETER * (*angle-old_angle) / 360;
 	}}
+
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 
@@ -121,34 +109,19 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	robot.setCounterL(counterL);
 	robot.setDistanceL(distanceLt);
 
-	counterRg = counterR;
-	angleRg = angleR;
-	counterLg = counterL;
-	angleLg = angleL;
-	d5al += 1;
-
-	distanceL = robot.getDistanceL();
-	distanceR = robot.getDistanceR();
-
-	state currentState = odometry(distanceL, distanceR);
-	x = currentState.position[0];
-	y = currentState.position[1];
-	angle_odo = radian2degree((milliradian2radian(currentState.angle)));
-	//path.updateState();
-	dt = HAL_GetTick() - time_var;
-	time_var = HAL_GetTick();
-	set_processVariable(currentState, dt);
+	path.updateState();
 
 }
 
-int commandL = 0;
-int commandR = 0;
+
+
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -170,6 +143,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+
 
 	HAL_Init();
 
@@ -211,43 +185,127 @@ Error_Handler();
   HAL_TIM_Encoder_Start_IT(&htim3, TIM_CHANNEL_ALL);
   HAL_TIM_Encoder_Start_IT(&htim2, TIM_CHANNEL_ALL);
 
-  /*job start;
-  start.type = xyAbsolute;
-  start.absoluteCoordinates = {0, 100};
 
-  job turnLeft;
-  turnLeft.type = alpha;
-  turnLeft.angle = degree2miliradian(-90);
+  job init;
+  init.absoluteCoordinates = {0 ,0};
+  init.type = xyAbsolute;
+  predefinedPath.push(init);
+
+  job start;
+  start.type = xyAbsolute;
+  start.absoluteCoordinates = {0, 450};
+  start.angle = NAN;
+
+  job turnRight1;
+  turnRight1.type = alpha;
+  turnRight1.angle = degree2miliradian(-90);
+
+  job go1;
+  go1.type = xyAbsolute;
+  go1.angle = NAN;
+  go1.absoluteCoordinates = {200, 450};
+
+  job turnRight2;
+  turnRight2.type = alpha;
+  turnRight2.angle = degree2miliradian(-180);
+
+  job go2;
+  go2.type = xyAbsolute;
+  go2.angle = NAN;
+  go2.absoluteCoordinates = {200, 0};
+
+  job turnRight3;
+  turnRight3.type = alpha;
+  turnRight3.angle = degree2miliradian(90);
+
+  job go3;
+  go3.type = xyAbsolute;
+  go3.angle = NAN;
+  go3.absoluteCoordinates = {0, 0};
+
+  job turnRight4;
+  turnRight4.type = alpha;
+  turnRight4.angle = degree2miliradian(0);
 
   job forward;
   forward.type = xyRelative;
   forward.translation = {10, 0};
 
+  job stop;
+  stop.type = alpha;
+  stop.absoluteCoordinates = {0, 0};
+  stop.angle = degree2miliradian(0);
 
+  job curve;
+  curve.absoluteCoordinates = {300, 400};
+  curve.type = xyAbsolute;
+  curve.angle = degree2miliradian(-90);
+
+  job micheal;
+  micheal.type = xyAbsolute;
+  micheal.absoluteCoordinates = {0, 300};
+  micheal.angle = (degree2miliradian(0));
+
+  job micheal2;
+  micheal2.type = xyAbsolute;
+  micheal2.absoluteCoordinates = {0, 500};
+  micheal2.angle = (degree2miliradian(0));
+
+  job micheal3;
+  micheal3.type = alpha;
+  micheal3.angle = (degree2miliradian(-180));
+
+  job dour1;
+  dour1.type = alpha;
+  dour1.angle = (degree2miliradian(-120));
+  job dour2;
+  dour2.type = alpha;
+  dour2.angle = (degree2miliradian(120));
+  job dour3;
+  dour3.type = alpha;
+  dour3.angle = (degree2miliradian(0));
+
+  /*
   job firstTask;
   firstTask.type = stop;
   firstTask.task = firstTaskfunc;
-
-
-  queue<job> predefinedPath;
-  predefinedPath.push(start);
-  predefinedPath.push(turnLeft);
-  predefinedPath.push(forward);
-
-  path.setPredefinedPath(predefinedPath);
   */
 
-  robot.setMotorR(0);
-  robot.setMotorL(0);
-  state initialState;
-  initialState.angle = 0;
-  initialState.position[0] = 0;
-  initialState.position[1] = 0;
-  initPID(initialState);
+  queue<job> predefinedPath;
+  
+  //predefinedPath.push(start);
+  /*
+  predefinedPath.push(turnRight1);
+  predefinedPath.push(go1);
+  predefinedPath.push(turnRight2);
+  predefinedPath.push(go2);
+  predefinedPath.push(turnRight3);
+  predefinedPath.push(go3);
+  predefinedPath.push(turnRight4);
+  */
+  predefinedPath.push(micheal);
+  predefinedPath.push(micheal2);
+  predefinedPath.push(micheal3);
 
-  vector<float> desiredPosition = {0 ,400};
-  set_SetPoint(desiredPosition, degree2miliradian(0));
-  vector<int> command;
+  // 360
+  //predefinedPath.push(dour1);
+  //predefinedPath.push(dour2);
+  //predefinedPath.push(dour3);
+  //predefinedPath.push(go3);
+
+
+  //predefinedPath.push(start);
+
+  //predefinedPath.push(start);
+  //predefinedPath.push(turnRight2);
+  //predefinedPath.push(go2);
+  //predefinedPath.push(start);
+
+
+  //predefinedPath.push(forward);
+
+  path.setPredefinedPath(predefinedPath);
+
 
 
   /* USER CODE END 2 */
@@ -256,14 +314,6 @@ Error_Handler();
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  command = controller();
-	  commandL = command[0];
-	  commandR = command[1];
-
-	  robot.setMotorL(commandL);
-	  robot.setMotorR(commandR);
-
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
