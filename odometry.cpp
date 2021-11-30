@@ -11,7 +11,6 @@
 float degree2radian(float degree ){
 	return degree * M_PI / 180;
 }
-
 float radian2degree(float rad ){
 	return rad * (180 / M_PI) ;
 }
@@ -27,17 +26,15 @@ float degree2miliradian(float deg){
  @return angle that will make the robot face the desired point
  */
 float relativeAngle(state currentState, vector<float> coordinates){
-
 	// if the two coordinates are on the same axe return 90
-	if ((coordinates[1] - currentState.position[1]) == 0)
-		return sign(coordinates[0] - currentState.position[0]) * degree2radian(90);
-	
-	// calculate the angle of the shortest path to the desired point from the current position of the robot
-	float angle =  sign(coordinates[0] - currentState.position[0]) * atan(-(coordinates[0] - currentState.position[0]) / (coordinates[1] - currentState.position[1]));
-
-	// if the resulted angle is the opposite direction
+	if ((coordinates[1] - currentState.position[1]) == 0){
+		return sign(currentState.position[0] - coordinates[0]) * degree2radian(90);
+	}
+		// calculate the angle of the shortest path to the desired point from the current position of the robot
+	float angle = atan( -(coordinates[0] - currentState.position[0]) / absolute(coordinates[1] - currentState.position[1])  );
+		// if the resulted angle is the opposite direction
 	if (sign(coordinates[1] - currentState.position[1]) == -1)
-		angle = sign(coordinates[0] - currentState.position[0]) * M_PI - angle;
+		angle = sign(angle) * (M_PI - absolute(angle));
 	
 	return angle;
 
@@ -65,11 +62,9 @@ float absoluteAngle(vector<float> coordinates){
 			+ (sign(coordinates[1]) ? 0 : radian2milliradian(degree2radian(90)) )	;
 }
 
-
 float radian2milliradian(float radian){
 	return 1000 * radian;
 }
-
 
 float milliradian2radian(float mrad){
 	return 0.001 * mrad;
@@ -82,12 +77,11 @@ float milliradian2radian(float mrad){
  */
 float mapAngle(float mrad){
 	if(mrad > degree2miliradian(180))
-		return mrad - degree2miliradian(360);
+		return (mrad - degree2miliradian(360));
 	if(mrad <= degree2miliradian(-180))
-		return mrad + degree2miliradian(360);
+		return (mrad + degree2miliradian(360));
 	return mrad;
 }
-
 
 
 //initialize the position vector
@@ -107,7 +101,7 @@ state odometry(float distanceL, float distanceR){
 	//the difference between the two value is the arc created by the rotation of the robot
 	// arc = angle * radius -> angle = arc / radius
 	// then map the angle to the correct interval [-180°, 180°]
-	float angle = mapAngle((distanceR - distanceL) / ENTRAXE);
+	float angle = mapAngle( radian2milliradian((distanceR - distanceL) / ENTRAXE));
 
 
 	//to simplify the robot is considered as a point in the 2D space
@@ -121,13 +115,13 @@ state odometry(float distanceL, float distanceR){
 
 	//project the result on the X and Y axis
 	//and add the variation for each axis
-	position[0] -= modulus * sin(angle); // X
-	position[1] += modulus * cos(angle);  // Y
+	position[0] -= modulus * sin(milliradian2radian(angle)); // X
+	position[1] += modulus * cos(milliradian2radian(angle));  // Y
 
 	//return the new values
 	state sensedState = {
 		position,
-		radian2milliradian(angle)
+		angle
 	};
 
 	return sensedState;
